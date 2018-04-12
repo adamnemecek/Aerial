@@ -23,10 +23,10 @@ class CheckCellView: NSTableCellView {
 
     override func awakeFromNib() {
         checkButton.target = self
-        checkButton.action = #selector(CheckCellView.check(_:))
+        checkButton.action = #selector(check)
     }
 
-    func check(_ button: AnyObject?) {
+    @objc func check(_ button: AnyObject?) {
         guard let onCheck = self.onCheck else {
             return
         }

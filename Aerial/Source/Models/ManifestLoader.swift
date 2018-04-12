@@ -39,10 +39,8 @@ class ManifestLoader {
             }
 
             // check if we're in offline mode
-            if offlineMode == true {
-                if video.isAvailableOffline == false {
-                    continue
-                }
+            if offlineMode && !video.isAvailableOffline {
+                continue
             }
 
             return video
@@ -78,8 +76,7 @@ class ManifestLoader {
             fatalError("Couldn't init URL from string")
         }
         // use ephemeral session so when we load json offline it fails and puts us in offline mode
-        let configuration = URLSessionConfiguration.ephemeral
-        let session = URLSession(configuration: configuration)
+        let session = URLSession(configuration: .ephemeral)
         let task = session.dataTask(with: url, completionHandler: completionHandler)
         task.resume()
     }
@@ -98,9 +95,8 @@ class ManifestLoader {
         var videos = [AerialVideo]()
 
         do {
-            let options = JSONSerialization.ReadingOptions.allowFragments
             let batches = try JSONSerialization.jsonObject(with: data,
-                                                           options: options) as! Array<NSDictionary>
+                                                           options: .allowFragments) as! Array<NSDictionary>
 
             for batch: NSDictionary in batches {
                 let assets = batch["assets"] as! Array<NSDictionary>
@@ -136,8 +132,8 @@ class ManifestLoader {
     }
 
     func checkContentLength(_ video: AerialVideo) {
-        let config = URLSessionConfiguration.default
-        let session = URLSession(configuration: config)
+
+        let session = URLSession(configuration: .default)
         let request = NSMutableURLRequest(url: video.url as URL)
         request.httpMethod = "HEAD"
 

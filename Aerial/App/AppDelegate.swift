@@ -12,7 +12,7 @@ import Cocoa
 class AppDelegate: NSObject, NSApplicationDelegate {
 
     @IBOutlet weak var window: NSWindow!
-    lazy var preferencesWindowController: PreferencesWindowController = PreferencesWindowController()
+    lazy var preferencesWindowController = PreferencesWindowController()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let objects = objectsFromNib(loadNibNamed: "PreferencesWindow")
@@ -28,11 +28,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func setUp(preferencesWindow window: NSWindow) {
         window.makeKeyAndOrderFront(self)
-        window.styleMask = [
-            NSTitledWindowMask,
-            NSClosableWindowMask,
-            NSMiniaturizableWindowMask
-        ]
+        window.styleMask = [.titled, .closable, .miniaturizable]
 
         var frame = window.frame
         frame.origin = window.frame.origin
@@ -42,7 +38,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func objectsFromNib(loadNibNamed nibName: String) -> [AnyObject] {
         let bundle = Bundle.main
         var topLevelObjects = NSArray()
-        bundle.loadNibNamed(nibName,
+        bundle.loadNibNamed(NSNib.Name(rawValue: nibName),
                             owner: preferencesWindowController,
                             topLevelObjects: &topLevelObjects)
         return topLevelObjects as [AnyObject]
