@@ -105,7 +105,7 @@ class AerialView: ScreenSaverView {
         if #available(OSX 10.10, *) {
             playerLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
         }
-        playerLayer.autoresizingMask = [CAAutoresizingMask.layerWidthSizable, CAAutoresizingMask.layerHeightSizable]
+        playerLayer.autoresizingMask = [.layerWidthSizable, .layerHeightSizable]
         playerLayer.frame = layer.bounds
         layer.addSublayer(playerLayer)
     }
@@ -248,22 +248,22 @@ class AerialView: ScreenSaverView {
         
         debugLog("observing current item \(currentItem)")
         notificationCenter.addObserver(self,
-                                       selector: #selector(AerialView.playerItemDidReachEnd(_:)),
-                                       name: NSNotification.Name.AVPlayerItemDidPlayToEndTime,
+                                       selector: #selector(playerItemDidReachEnd),
+                                       name: .AVPlayerItemDidPlayToEndTime,
                                        object: currentItem)
         notificationCenter.addObserver(self,
-                                       selector: #selector(AerialView.playerItemNewErrorLogEntryNotification(_:)),
-                                       name: NSNotification.Name.AVPlayerItemNewErrorLogEntry,
+                                       selector: #selector(playerItemNewErrorLogEntryNotification),
+                                       name: .AVPlayerItemNewErrorLogEntry,
                                        object: currentItem)
         notificationCenter.addObserver(self,
-                                       selector: #selector(AerialView.playerItemFailedtoPlayToEnd(_:)),
-                                       name: NSNotification.Name.AVPlayerItemFailedToPlayToEndTime,
+                                       selector: #selector(playerItemFailedtoPlayToEnd),
+                                       name: .AVPlayerItemFailedToPlayToEndTime,
                                        object: currentItem)
         notificationCenter.addObserver(self,
-                                       selector: #selector(AerialView.playerItemPlaybackStalledNotification(_:)),
-                                       name: NSNotification.Name.AVPlayerItemPlaybackStalled,
+                                       selector: #selector(playerItemPlaybackStalledNotification),
+                                       name: .AVPlayerItemPlaybackStalled,
                                        object: currentItem)
-        player.actionAtItemEnd = AVPlayerActionAtItemEnd.none
+        player.actionAtItemEnd = .none
     }
     
     // MARK: - Preferences

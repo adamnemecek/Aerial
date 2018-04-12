@@ -87,15 +87,15 @@ NSOutlineViewDelegate, VideoDownloadDelegate {
         playerView.player = player
         playerView.controlsStyle = .none
         if #available(OSX 10.10, *) {
-            playerView.videoGravity = AVLayerVideoGravityResizeAspectFill
+            playerView.videoGravity = AVLayerVideoGravityResizeAspectFill.rawValue
         }
         
         if preferences.differentAerialsOnEachDisplay {
-            differentAerialCheckbox.state = NSOnState
+            differentAerialCheckbox.state = .on
         }
         
         if !preferences.cacheAerials {
-            cacheAerialsAsTheyPlayCheckbox.state = NSOffState
+            cacheAerialsAsTheyPlayCheckbox.state = .off
         }
         
         colorizeProjectPageLink()
@@ -114,7 +114,7 @@ NSOutlineViewDelegate, VideoDownloadDelegate {
         let link = projectPageLink.attributedTitle
         let coloredLink = NSMutableAttributedString(attributedString: link)
         let fullRange = NSRange(location: 0, length: coloredLink.length)
-        coloredLink.addAttribute(NSForegroundColorAttributeName,
+        coloredLink.addAttribute(kCTForegroundColorAttributeName,
                                  value: color,
                                   range: fullRange)
         projectPageLink.attributedTitle = coloredLink
@@ -125,7 +125,7 @@ NSOutlineViewDelegate, VideoDownloadDelegate {
     @IBAction func cacheAerialsAsTheyPlayClick(_ button: NSButton!) {
         debugLog("cache aerials as they play: \(button.state)")
         
-        let onState = (button.state == NSOnState)
+        let onState = (button.state == .on)
         preferences.cacheAerials = onState
     }
     
@@ -199,7 +199,7 @@ NSOutlineViewDelegate, VideoDownloadDelegate {
     
     @IBAction func differentAerialsOnEachDisplayCheckClick(_ button: NSButton?) {
         let state = differentAerialCheckbox.state
-        let onState = (state == NSOnState)
+        let onState = (state == .on)
         
         preferences.differentAerialsOnEachDisplay = onState
         
@@ -354,9 +354,7 @@ NSOutlineViewDelegate, VideoDownloadDelegate {
     
     func outlineView(_ outlineView: NSOutlineView, isGroupItem item: Any) -> Bool {
         switch item {
-        case is TimeOfDay:
-            return true
-        case is City:
+        case is TimeOfDay, is City:
             return true
         default:
             return false
@@ -399,7 +397,7 @@ NSOutlineViewDelegate, VideoDownloadDelegate {
             let number = video.arrayPosition + 1
             let numberFormatter = NumberFormatter()
             
-            numberFormatter.numberStyle = NumberFormatter.Style.spellOut
+            numberFormatter.numberStyle = .spellOut
             guard
                 let numberString = numberFormatter.string(from: number as NSNumber)
                 else {
@@ -412,9 +410,9 @@ NSOutlineViewDelegate, VideoDownloadDelegate {
             let isInRotation = preferences.videoIsInRotation(videoID: video.id)
             
             if isInRotation {
-                view.checkButton.state = NSOnState
+                view.checkButton.state = .on
             } else {
-                view.checkButton.state = NSOffState
+                view.checkButton.state = .off
             }
             
             view.onCheck = { checked in
@@ -453,11 +451,7 @@ NSOutlineViewDelegate, VideoDownloadDelegate {
     
     func outlineView(_ outlineView: NSOutlineView, heightOfRowByItem item: Any) -> CGFloat {
         switch item {
-        case is AerialVideo:
-            return 18
-        case is TimeOfDay:
-            return 18
-        case is City:
+        case is AerialVideo, is TimeOfDay, is City:
             return 18
         default:
             return 0
