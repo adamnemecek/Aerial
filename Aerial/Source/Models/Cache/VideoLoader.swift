@@ -32,7 +32,7 @@ class VideoLoader: NSObject, NSURLConnectionDataDelegate {
         self.loadingRequest = loadingRequest
 
         let request = NSMutableURLRequest(url: url)
-        request.cachePolicy = NSURLRequest.CachePolicy.reloadIgnoringCacheData
+        request.cachePolicy = .reloadIgnoringCacheData
 
         loadRange = false
         loadedRange = NSRange(location: 0, length: 0)
@@ -61,7 +61,7 @@ class VideoLoader: NSObject, NSURLConnectionDataDelegate {
             return
         }
 
-        connection.setDelegateQueue(OperationQueue.main)
+        connection.setDelegateQueue(.main)
         loadedRange = NSRange(location: requestedRange.location, length: 0)
 
         connection.start()
@@ -111,7 +111,7 @@ class VideoLoader: NSObject, NSURLConnectionDataDelegate {
             // check if we've already been sending content, or we're at right byte offset
             if loadedLocation >= requestedRange.location {
 
-                let requestedEndOffset = Int(dataRequest.requestedOffset + dataRequest.requestedLength)
+                let requestedEndOffset = Int(dataRequest.requestedOffset.advanced(by: dataRequest.requestedLength))
 
                 let pendingDataEndOffset = loadedLocation + data.count
 
@@ -140,7 +140,7 @@ class VideoLoader: NSObject, NSURLConnectionDataDelegate {
                     let responseData = data.subdata(in: inset..<end)
                     dataRequest.respond(with: responseData)
 
-                    if dataRequest.currentOffset >= dataRequest.requestedOffset + dataRequest.requestedLength {
+                    if dataRequest.currentOffset >= dataRequest.requestedOffset.advanced(by: dataRequest.requestedLength) {
                         self.loadingRequest.finishLoading()
                         self.connection?.cancel()
                     }
@@ -206,7 +206,7 @@ class VideoLoader: NSObject, NSURLConnectionDataDelegate {
         do {
             // Check to see if the server returned a valid byte-range
             regex = try NSRegularExpression(pattern: "bytes (\\d+)-\\d+/\\d+",
-                                            options: NSRegularExpression.Options.caseInsensitive)
+                                            options: .caseInsensitive)
         } catch let error as NSError {
             NSLog("Aerial: Error formatting regex: \(error)")
             return nil
@@ -225,7 +225,7 @@ class VideoLoader: NSObject, NSURLConnectionDataDelegate {
             debugLog("Weird, couldn't make a regex match for byte offset: \(contentRange)")
             return nil
         }
-        let offsetMatchRange = match.rangeAt(1)
+        let offsetMatchRange = match.range(at: 1)
         let offsetString = contentRange.substring(with: offsetMatchRange) as NSString
 
         let offset = offsetString.longLongValue

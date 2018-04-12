@@ -59,7 +59,7 @@ class VideoDownload: NSObject, NSURLConnectionDataDelegate {
 
     func startDownloadForChunk(_ chunk: NSRange?) {
         let request = NSMutableURLRequest(url: video.url as URL)
-        request.cachePolicy = NSURLRequest.CachePolicy.reloadIgnoringCacheData
+        request.cachePolicy = .reloadIgnoringCacheData
 
         if let requestedRange = chunk {
             // set Range: bytes=startOffset-endOffset
@@ -87,14 +87,8 @@ class VideoDownload: NSObject, NSURLConnectionDataDelegate {
 
     }
 
-    func streamForConnection(_ connection: NSURLConnection) -> VideoDownloadStream? {
-        for stream in streams {
-            if stream.connection == connection {
-                return stream
-            }
-        }
-
-        return nil
+    func stream(for connection: NSURLConnection) -> VideoDownloadStream? {
+        return stream.first { $0.connection == connection }
     }
 
     func createStreamsBasedOnContentLength(_ contentLength: Int) {
@@ -138,7 +132,7 @@ class VideoDownload: NSObject, NSURLConnectionDataDelegate {
         }
     }
 
-    func receiveDataForStream(_ stream: VideoDownloadStream, receivedData: Data) {
+    func receiveData(for stream: VideoDownloadStream, receivedData: Data) {
         guard let videoData = self.data else {
             NSLog("Aerial error: video data missing!")
             return
@@ -185,14 +179,14 @@ class VideoDownload: NSObject, NSURLConnectionDataDelegate {
     // MARK: - NSURLConnection Delegate
 
     func connection(_ connection: NSURLConnection, didReceive response: URLResponse) {
-        guard let stream = streamForConnection(connection) else {
+        guard let stream = stream(for: connection) else {
             NSLog("Aerial Error: No matching stream for connection: \(connection) with response: \(response)")
             return
         }
 
         stream.response = response as? HTTPURLResponse
 
-        if stream.contentInformationRequest == true {
+        if stream.contentInformationRequest {
             connection.cancel()
 
             queue.async(execute: { () -> Void in
@@ -225,12 +219,12 @@ class VideoDownload: NSObject, NSURLConnectionDataDelegate {
             let progress: Float = Float(self.downloadedData) / Float(self.contentLength)
             delegate.videoDownload(self, receivedBytes: data.count, progress: progress)
 
-            guard let stream = self.streamForConnection(connection) else {
+            guard let stream = self.stream(for: connection) else {
                 NSLog("Aerial Error: No matching stream for connection: \(connection)")
                 return
             }
 
-            self.receiveDataForStream(stream, receivedData: data)
+            self.receiveData(for: stream, receivedData: data)
         }
     }
 
@@ -238,7 +232,7 @@ class VideoDownload: NSObject, NSURLConnectionDataDelegate {
         queue.async { () -> Void in
             debugLog("connectionDidFinishLoading")
 
-            guard let stream = self.streamForConnection(connection) else {
+            guard let stream = self.stream(for: connection) else {
                 NSLog("Aerial Error: No matching stream for connection: \(connection)")
                 return
             }
@@ -278,7 +272,7 @@ class VideoDownload: NSObject, NSURLConnectionDataDelegate {
         do {
             // Check to see if the server returned a valid byte-range
             regex = try NSRegularExpression(pattern: "bytes (\\d+)-\\d+/\\d+",
-                                            options: NSRegularExpression.Options.caseInsensitive)
+                                            options: .caseInsensitive)
         } catch let error as NSError {
             NSLog("Aerial: Error formatting regex: \(error)")
             return nil
@@ -297,7 +291,7 @@ class VideoDownload: NSObject, NSURLConnectionDataDelegate {
             debugLog("Weird, couldn't make a regex match for byte offset: \(contentRange)")
             return nil
         }
-        let offsetMatchRange = match.rangeAt(1)
+        let offsetMatchRange = match.range(at: 1)
         let offsetString = contentRange.substring(with: offsetMatchRange) as NSString
 
         let offset = offsetString.longLongValue
