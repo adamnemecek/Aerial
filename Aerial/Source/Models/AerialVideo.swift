@@ -17,13 +17,13 @@ class AerialVideo {
     var arrayPosition = 1
     var contentLength = 0
     var contentLengthChecked = false
-    
+
     var isAvailableOffline: Bool {
         get {
             return VideoCache.isAvailableOffline(video: self)
         }
     }
-    
+
     init(id: String, name: String, type: String,
          timeOfDay: String, url: String) {
         self.id = id

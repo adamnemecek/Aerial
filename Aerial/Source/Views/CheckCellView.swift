@@ -12,30 +12,30 @@ class CheckCellView: NSTableCellView {
 
     @IBOutlet var checkButton: NSButton!
     var onCheck: ((Bool) -> (Void))?
-    
+
     override required init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
     }
-    
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
-    
+
     override func awakeFromNib() {
         checkButton.target = self
         checkButton.action = #selector(CheckCellView.check(_:))
     }
-    
-    func check(_ button: AnyObject?) {        
+
+    func check(_ button: AnyObject?) {
         guard let onCheck = self.onCheck else {
             return
         }
-        
+
         onCheck(checkButton.state == .on)
     }
-    
+
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
     }
-    
+
 }
